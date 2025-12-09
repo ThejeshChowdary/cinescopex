@@ -1,7 +1,16 @@
-export default function NotFoundLayout({ children }: { children: React.ReactNode }) {
+import "./globals.css";
+
+export const metadata = {
+    title: "CineScopeX",
+    description: "Movie Explorer App",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
-            {children}
-        </div>
+        <html lang="en">
+            <body className="bg-black text-white">
+                {children}
+            </body>
+        </html>
     );
 }

@@ -1,25 +1,43 @@
-import MovieCard from "../components/MovieCard";
-import { fetchFromTMDB } from "../lib/tmdb";
+'use client';
 
-export default async function Home() {
-    const { results: trending } = await fetchFromTMDB("/trending/movie/day");
-    const { results: popular } = await fetchFromTMDB("/movie/popular");
+import { useEffect, useState } from "react";
+import Banner from "./components/Banner";
+import MovieCard from "./components/MovieCard";
+import Navbar from "./components/Navbar";
+import { IMDBMovie } from "@/src/types/movie";
+import { fetchTop250Movies } from "./services/top250Movies";
+
+export default function Home() {
+    const [movies, setMovies] = useState<IMDBMovie[]>([]);
+
+    useEffect(() => {
+        const loadTopMovies = async () => {
+            try {
+                const data = await fetchTop250Movies();
+                setMovies(data);
+            } catch (err) {
+                console.error("Failed to fetch Top 250 movies:", err);
+            }
+        };
+
+        loadTopMovies();
+    }, []);
 
     return (
-        <div className="px-6">
-            <h1 className="text-3xl font-bold my-6">Trending Movies</h1>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {trending.map((movie: any) => (
-                    <MovieCard key={movie.id} movie={movie} />
-                ))}
+        <div>
+            <Navbar />
+            <div className="mt-20">
+                <Banner />
             </div>
+            <section className="px-6 mt-8">
+                <h2 className="text-2xl font-semibold mb-4">Trending Movies</h2>
 
-            <h1 className="text-3xl font-bold my-6">Popular Movies</h1>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {popular.map((movie: any) => (
-                    <MovieCard key={movie.id} movie={movie} />
-                ))}
-            </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    {movies.map((movie) => (
+                        <MovieCard key={movie.id} movie={movie} />
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }
