@@ -1,3 +1,4 @@
+import Navbar from "./components/Navbar";
 import "./globals.css";
 
 interface LocaleLayoutProps {
@@ -13,6 +14,7 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
     return (
         <html lang="en">
             <body className="bg-black text-white">
+                <Navbar />
                 {children}
             </body>
         </html>

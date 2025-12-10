@@ -1,13 +1,26 @@
 'use client';
 
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
     const router = useRouter();
-    const pathname = usePathname();
     const [query, setQuery] = useState("");
     const [activeTab, setActiveTab] = useState<string>("movies");
+
+    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+    const moviesList = [
+        { title: "Action", path: "/movies/action" },
+        { title: "Comedy", path: "/movies/comedy" },
+        { title: "Horror", path: "/movies/horror" },
+        { title: "Sci-Fi", path: "/movies/sci-fi" },
+    ];
+
+    const tvShowsList = [
+        { title: "Top 250", path: "/tvshows/top-250" },
+        { title: "Most Popular", path: "/tvshows/most-popular" },
+    ];
 
     const handleSearch = () => {
         if (!query.trim()) return;
@@ -19,9 +32,10 @@ export default function Navbar() {
         if (e.key === "Enter") handleSearch();
     };
 
-    const handleTabClick = (tab: string, path: string) => {
-        setActiveTab(tab);
+    const goTo = (path: string, tab?: string) => {
+        if (tab) setActiveTab(tab);
         router.push(path);
+        setOpenDropdown(null);
     };
 
     return (
@@ -29,39 +43,110 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-6 py-4 gap-4 md:gap-0">
 
                 {/* Logo */}
-                <h1 className="text-2xl font-bold text-red-500 cursor-pointer" onClick={() => router.push("/")}>
+                <h1
+                    className="text-2xl font-bold text-red-500 cursor-pointer"
+                    onClick={() => goTo("/")}
+                >
                     CineScopeX
                 </h1>
-                <div className="flex flex-row gap-12">
+
+                <div className="flex flex-row gap-12 relative">
+
                     {/* Tabs */}
                     <div className="flex items-center gap-6">
+
+                        {/* Trending */}
                         <button
-                            className={`text-white font-semibold hover:text-red-500 cursor-pointer transition ${activeTab === "upcoming" ? "text-red-500" : ""}`}
-                            onClick={() => handleTabClick("upcoming", "/upcoming")}
+                            className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "trending" ? "text-red-500" : ""}`}
+                            onClick={() => goTo("/trending", "trending")}
                         >
                             Trending
                         </button>
-                        <button
-                            className={`text-white font-semibold hover:text-red-500 transition cursor-pointer  ${activeTab === "movies" ? "text-red-500" : ""}`}
-                            onClick={() => handleTabClick("movies", "/movies")}
+
+                        {/* Movies (dropdown) */}
+                        <div
+                            className="relative"
+                            onMouseEnter={() => setOpenDropdown("movies")}
+                            onMouseLeave={() => setOpenDropdown(null)}
                         >
-                            Movies
-                        </button>
-                        <button
-                            className={`text-white font-semibold hover:text-red-500 transition cursor-pointer  ${activeTab === "tv" ? "text-red-500" : ""}`}
-                            onClick={() => handleTabClick("tv", "/tv")}
+                            <button
+                                className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "movies" ? "text-red-500" : ""}`}
+                                onClick={() => goTo("/movies", "movies")}
+                            >
+                                Movies ▾
+                            </button>
+
+                            {openDropdown === "movies" && (
+                                <div className="absolute left-0 mt-2 bg-black border border-gray-700 rounded-md shadow-lg p-2 w-40">
+                                    {moviesList.map((item) => (
+                                        <div
+                                            key={item.title}
+                                            className="text-white p-2 rounded hover:bg-gray-800 cursor-pointer"
+                                            onClick={() => goTo(item.path)}
+                                        >
+                                            {item.title}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* TV Shows (dropdown) */}
+                        {/* TV Shows (dropdown) */}
+                        <div
+                            className="relative"
+                            onMouseEnter={() => setOpenDropdown("tvshows")}
+                            onMouseLeave={() => setOpenDropdown(null)}
                         >
-                            TV Shows
-                        </button>
+                            <button
+                                className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "tvshows" ? "text-red-500" : ""
+                                    }`}
+                                onClick={() =>
+                                    setOpenDropdown(openDropdown === "tvshows" ? null : "tvshows")
+                                }
+                            >
+                                TV Shows ▾
+                            </button>
+
+                            {openDropdown === "tvshows" && (
+                                <div className="absolute left-0 mt-2 z-50">
+
+                                    {/* Triangle */}
+                                    <div
+                                        className="absolute -top-2 left-4 w-4 h-4 bg-black border-l border-t border-gray-700 rotate-45"
+                                    />
+
+                                    {/* Dropdown box */}
+                                    <div className="relative bg-black border border-gray-700 rounded-md shadow-lg p-2 min-w-[140px]">
+
+                                        {tvShowsList.map((item) => (
+                                            <div
+                                                key={item.title}
+                                                className="text-white p-2 rounded hover:bg-gray-800 cursor-pointer"
+                                                onClick={() => {
+                                                    setOpenDropdown(null);
+                                                    goTo(item.path);
+                                                }}
+                                            >
+                                                {item.title}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+
                         <button
-                            className={`text-white font-semibold hover:text-red-500 transition cursor-pointer  ${activeTab === "upcoming" ? "text-red-500" : ""}`}
-                            onClick={() => handleTabClick("upcoming", "/upcoming")}
+                            className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "most-popular" ? "text-red-500" : ""}`}
+                            onClick={() => goTo("/most-popular", "most-popular")}
                         >
                             Most Popular
                         </button>
+
                         <button
-                            className={`text-white font-semibold hover:text-red-500 transition cursor-pointer  ${activeTab === "upcoming" ? "text-red-500" : ""}`}
-                            onClick={() => handleTabClick("upcoming", "/upcoming")}
+                            className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "upcoming" ? "text-red-500" : ""}`}
+                            onClick={() => goTo("/upcoming", "upcoming")}
                         >
                             Upcoming
                         </button>
@@ -84,6 +169,7 @@ export default function Navbar() {
                             Search
                         </button>
                     </div>
+
                 </div>
             </div>
         </nav>

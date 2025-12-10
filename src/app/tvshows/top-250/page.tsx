@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import Banner from "./components/Banner";
-import MovieCard from "./components/MovieCard";
 import { IMDBMovie } from "@/src/types/movie";
-import { fetchTop250Movies } from "./services/top250Movies";
+import { useEffect, useState } from "react";
+import { fetchPopularTvShows } from "../_services/MostPopularShows.service";
+import Banner from "../../components/Banner";
+import MovieCard from "../../components/MovieCard";
+
 
 export default function Home() {
     const [movies, setMovies] = useState<IMDBMovie[]>([]);
@@ -12,7 +13,7 @@ export default function Home() {
     useEffect(() => {
         const loadTopMovies = async () => {
             try {
-                const data = await fetchTop250Movies();
+                const data = await fetchPopularTvShows();
                 setMovies(data);
             } catch (err) {
                 console.error("Failed to fetch Top 250 movies:", err);
@@ -28,7 +29,7 @@ export default function Home() {
                 <Banner />
             </div>
             <section className="px-6 mt-8">
-                <h2 className="text-2xl font-semibold mb-4">Trending Movies</h2>
+                <h2 className="text-2xl font-semibold mb-4">Popular Tv Shows</h2>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                     {movies.map((movie) => (

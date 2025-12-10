@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import Banner from "./components/Banner";
-import MovieCard from "./components/MovieCard";
 import { IMDBMovie } from "@/src/types/movie";
-import { fetchTop250Movies } from "./services/top250Movies";
+import { useEffect, useState } from "react";
+import { fetchTop250Movies } from "../services/top250Movies";
+import Banner from "../components/Banner";
+import MovieCard from "../components/MovieCard";
 
 export default function Home() {
     const [movies, setMovies] = useState<IMDBMovie[]>([]);
