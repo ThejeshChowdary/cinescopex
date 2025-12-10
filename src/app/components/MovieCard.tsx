@@ -3,7 +3,6 @@ import { IMDBMovie } from "@/src/types/movie";
 interface MovieCardProps {
     movie: IMDBMovie;
 }
-
 export default function MovieCard({ movie }: MovieCardProps) {
     const image =
         movie.primaryImage ||
