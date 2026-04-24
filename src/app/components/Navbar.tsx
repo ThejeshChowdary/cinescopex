@@ -48,10 +48,10 @@ export default function Navbar({ onSearch }: NavbarProps) {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-6 py-4 gap-4 md:gap-0">
 
                 {/* Logo */}
-                <h1
-                    className="text-2xl font-bold text-red-500 cursor-pointer"
+                <h1 className="flex text-2xl font-bold text-red-500 cursor-pointer gap-2 justify-center items-center"
                     onClick={() => goTo("/")}
                 >
+                    <img src="/favicon.svg" alt="CineScopeX" width={40} height={40} />
                     CineScopeX
                 </h1>
 

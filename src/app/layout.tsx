@@ -8,6 +8,9 @@ interface LocaleLayoutProps {
 export const metadata = {
     title: "CineScopeX",
     description: "Explore movies with style",
+    icons: {
+        icon: "/favicon.svg",
+    },
 };
 
 export default async function LocaleLayout({ children }: LocaleLayoutProps) {
