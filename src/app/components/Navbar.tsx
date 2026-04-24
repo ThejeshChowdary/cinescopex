@@ -3,19 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Navbar() {
+interface NavbarProps {
+    onSearch?: (query: string) => void;
+}
+
+export default function Navbar({ onSearch }: NavbarProps) {
     const router = useRouter();
     const [query, setQuery] = useState("");
     const [activeTab, setActiveTab] = useState<string>("movies");
-
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-
-    const moviesList = [
-        { title: "Action", path: "/movies/action" },
-        { title: "Comedy", path: "/movies/comedy" },
-        { title: "Horror", path: "/movies/horror" },
-        { title: "Sci-Fi", path: "/movies/sci-fi" },
-    ];
 
     const tvShowsList = [
         { title: "Top 250", path: "/tvshows/top-250" },
@@ -24,8 +20,17 @@ export default function Navbar() {
 
     const handleSearch = () => {
         if (!query.trim()) return;
-        router.push(`/search?query=${encodeURIComponent(query)}`);
-        setQuery("");
+        if (onSearch) {
+            onSearch(query); // ← call parent callback, no navigation
+        } else {
+            router.push(`/search?query=${encodeURIComponent(query)}`); // fallback for other pages
+        }
+    };
+
+    const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setQuery(val);
+        if (val === "" && onSearch) onSearch(""); // clear results when input is emptied
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -57,7 +62,7 @@ export default function Navbar() {
 
                         {/* Trending */}
                         <button
-                            className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "trending" ? "text-red-500" : ""}`}
+                            className={`text-white font-semibold hover:text-red-500 transition cursor-pointer ${activeTab === "trending" ? "text-red-500" : ""}`}
                             onClick={() => goTo("/trending", "trending")}
                         >
                             Trending
@@ -70,28 +75,13 @@ export default function Navbar() {
                             onMouseLeave={() => setOpenDropdown(null)}
                         >
                             <button
-                                className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "movies" ? "text-red-500" : ""}`}
+                                className={`text-white font-semibold hover:text-red-500 transition cursor-pointer ${activeTab === "movies" ? "text-red-500" : ""}`}
                                 onClick={() => goTo("/movies", "movies")}
                             >
-                                Movies ▾
+                                Movies
                             </button>
-
-                            {openDropdown === "movies" && (
-                                <div className="absolute left-0 mt-2 bg-black border border-gray-700 rounded-md shadow-lg p-2 w-40">
-                                    {moviesList.map((item) => (
-                                        <div
-                                            key={item.title}
-                                            className="text-white p-2 rounded hover:bg-gray-800 cursor-pointer"
-                                            onClick={() => goTo(item.path)}
-                                        >
-                                            {item.title}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
 
-                        {/* TV Shows (dropdown) */}
                         {/* TV Shows (dropdown) */}
                         <div
                             className="relative"
@@ -99,8 +89,7 @@ export default function Navbar() {
                             onMouseLeave={() => setOpenDropdown(null)}
                         >
                             <button
-                                className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "tvshows" ? "text-red-500" : ""
-                                    }`}
+                                className={`text-white font-semibold hover:text-red-500 transition cursor-pointer ${activeTab === "tvshows" ? "text-red-500" : ""}`}
                                 onClick={() =>
                                     setOpenDropdown(openDropdown === "tvshows" ? null : "tvshows")
                                 }
@@ -110,15 +99,8 @@ export default function Navbar() {
 
                             {openDropdown === "tvshows" && (
                                 <div className="absolute left-0 mt-2 z-50">
-
-                                    {/* Triangle */}
-                                    <div
-                                        className="absolute -top-2 left-4 w-4 h-4 bg-black border-l border-t border-gray-700 rotate-45"
-                                    />
-
-                                    {/* Dropdown box */}
+                                    <div className="absolute -top-2 left-4 w-4 h-4 bg-black border-l border-t border-gray-700 rotate-45" />
                                     <div className="relative bg-black border border-gray-700 rounded-md shadow-lg p-2 min-w-[140px]">
-
                                         {tvShowsList.map((item) => (
                                             <div
                                                 key={item.title}
@@ -136,9 +118,8 @@ export default function Navbar() {
                             )}
                         </div>
 
-
                         <button
-                            className={`text-white font-semibold hover:text-red-500 transition ${activeTab === "most-popular" ? "text-red-500" : ""}`}
+                            className={`text-white font-semibold hover:text-red-500 transition cursor-pointer ${activeTab === "most-popular" ? "text-red-500" : ""}`}
                             onClick={() => goTo("/most-popular", "most-popular")}
                         >
                             Most Popular
@@ -159,15 +140,27 @@ export default function Navbar() {
                             placeholder="Search movies..."
                             className="p-2 rounded-md border border-gray-700 bg-black/50 text-white flex-1 focus:outline-none focus:ring-2 focus:ring-red-500"
                             value={query}
-                            onChange={(e) => setQuery(e.target.value)}
+                            onChange={handleQueryChange}
                             onKeyDown={handleKeyPress}
                         />
-                        <button
-                            onClick={handleSearch}
-                            className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-700 transition"
-                        >
-                            Search
-                        </button>
+                        {query.trim() ? (
+                            <button
+                                onClick={() => {
+                                    setQuery("");
+                                    if (onSearch) onSearch("");
+                                }}
+                                className="bg-gray-600 px-4 py-2 rounded-md hover:bg-gray-700 transition cursor-pointer"
+                            >
+                                Clear
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleSearch}
+                                className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-700 transition cursor-pointer"
+                            >
+                                Search
+                            </button>
+                        )}
                     </div>
 
                 </div>
